@@ -368,8 +368,11 @@ if __name__ == '__main__':
   if args.format == 'json':
     print(json.dumps(output_list, indent = 2))
   elif args.format == 'csv':
-    csv_writer = csv.writer(sys.stdout)
-    csv_writer.writerows(output_csv)
+    csv_file = 'client_data.csv'
+
+    with open(csv_file, 'w', newline='') as csvfile:
+      csv_writer = csv.writer(csvfile)
+      csv_writer.writerows(output_csv)
   else: # elif args.format == 'text':
     print(output_text)
 
