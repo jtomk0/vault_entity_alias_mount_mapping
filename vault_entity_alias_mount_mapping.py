@@ -35,6 +35,7 @@ def get_entity_list(client, active_entities, namespace_id, namespace_name):
     append_output_text("Entities:\n")
     list_entities_response = client.secrets.identity.list_entities()
     entity_ids = list_entities_response['data']['keys']
+    
     # entities list to return for json output
     entities = []
 
@@ -149,7 +150,7 @@ def get_active_entities(vault_addr, vault_token):
   active_entities_dict = {}
 
   now = int(time.time())
-  start_time = now - (365 * 24 * 60 * 60) # one year ago
+  start_time = now - (2 * 365 * 24 * 60 * 60) # three years ago
 
   activity_url = vault_addr + '/v1/sys/internal/counters/activity/export?end_time=' + str(now) + '&start_time=' + str(start_time)
   logging.debug("activity url: %s", activity_url)
@@ -290,7 +291,8 @@ if __name__ == '__main__':
   vault_version = health_check(
     hvac.Client(url = vault_addr)
   )
-  if vault_version.startswith('1.11'):
+
+  if vault_version[0:4] >= '1.11':
     active_entities = get_active_entities(vault_addr, vault_token) # we don't pass namespace because the Activity Export API appears to only work on the root namespace.
   else:
     active_entities = {}
