@@ -35,7 +35,7 @@ def get_entity_list(client, active_entities, namespace_id, namespace_name):
     append_output_text("Entities:\n")
     list_entities_response = client.secrets.identity.list_entities()
     entity_ids = list_entities_response['data']['keys']
-    
+
     # entities list to return for json output
     entities = []
 
@@ -54,22 +54,41 @@ def get_entity_list(client, active_entities, namespace_id, namespace_name):
         active = False
         timestamp = None
 
-      #print("Entity ID:\t{id} {active}\nEntity Name:\t{name}".format(active=active, id=entity_id, name=name))
-
       entity_aliases = read_entity_response['data']['aliases']
 
       entity_aliases_list = []
       for entity_alias in entity_aliases:
+        try:
+          mount_type = entity_alias['mount_type']
+          append_output_text("\t\t\tMount Type:\t\t{mount_type}\n".format(mount_type=mount_type))
+        except Exception as ex:
+          template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+          message = template.format(type(ex).__name__, ex.args)
+          logging.debug(message)
+          mount_type = ''
+          append_output_text("\t\t\tMount Type:\t\t{mount_type}\n".format(mount_type=mount_type))
+          pass
+        
+        try:
+          mount_path = entity_alias['mount_path']
+          append_output_text("\t\t\tMount Path:\t\t{mount_path}\n".format(mount_path=mount_path))
+        except Exception as ex:
+          template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+          message = template.format(type(ex).__name__, ex.args)
+          logging.debug(message)
+          mount_path = ''
+          append_output_text("\t\t\tMount Path:\t\t{mount_path}\n".format(mount_path=mount_path))
+          pass
+
         entity_alias_id = entity_alias['id']
-        mount_path = entity_alias['mount_path']
+        append_output_text("\t\t\tEntity Alias ID:\t{entity_alias_id}\n".format(entity_alias_id=entity_alias_id))
+
         mount_accessor = entity_alias['mount_accessor']
-        mount_type = entity_alias['mount_type']
+        append_output_text("\t\t\tMount Accessor:\t\t{mount_accessor}\n".format(mount_accessor=mount_accessor))
+
         entity_alias_name = entity_alias['name']
         append_output_text("\t\t\tEntity Alias Name:\t{entity_alias_name}\n".format(entity_alias_name=entity_alias_name))
-        append_output_text("\t\t\tEntity Alias ID:\t{entity_alias_id}\n".format(entity_alias_id=entity_alias_id))
-        append_output_text("\t\t\tMount Path:\t\t{mount_path}\n".format(mount_path=mount_path))
-        append_output_text("\t\t\tMount Accessor:\t\t{mount_accessor}\n".format(mount_accessor=mount_accessor))
-        append_output_text("\t\t\tMount Type:\t\t{mount_type}\n".format(mount_type=mount_type))
+          
         append_output_text("\n")
         entity_aliases_list.append(
           {
@@ -81,8 +100,8 @@ def get_entity_list(client, active_entities, namespace_id, namespace_name):
           }
         )
 
-        # csv format:
-        # namespace_id, namespace_name, entity_id, entity_name, active, first_seen, entity_alias_id, entity_alias_name, mount_path, mount_accessor, mount_type
+          # csv format:
+          # namespace_id, namespace_name, entity_id, entity_name, active, first_seen, entity_alias_id, entity_alias_name, mount_path, mount_accessor, mount_type
         output_csv.append(
           [
             namespace_id,
@@ -111,7 +130,11 @@ def get_entity_list(client, active_entities, namespace_id, namespace_name):
 
     append_output_text("\n" + output_line + "\n")
     return(entities)
-  except Exception as e:
+  
+  except Exception as ex:
+    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+    message = template.format(type(ex).__name__, ex.args)
+    logging.debug(message)
     pass
 
 def get_namespaces(client):
@@ -146,11 +169,10 @@ def get_active_entities(vault_addr, vault_token):
   # experimental
   # see https://www.vaultproject.io/api-docs/system/internal-counters#activity-export
 
-  #active_entities_list = []
   active_entities_dict = {}
 
   now = int(time.time())
-  start_time = now - (2 * 365 * 24 * 60 * 60) # three years ago
+  start_time = now - (365 * 24 * 60 * 60) # three years ago
 
   activity_url = vault_addr + '/v1/sys/internal/counters/activity/export?end_time=' + str(now) + '&start_time=' + str(start_time)
   logging.debug("activity url: %s", activity_url)
@@ -169,9 +191,7 @@ def get_active_entities(vault_addr, vault_token):
     entity_json = json.loads(entity)
     entity_id = entity_json['client_id']
     timestamp = entity_json['timestamp']
-    #active_entities_list.append(json.loads(entity)['client_id'])
     active_entities_dict[entity_id] = timestamp
-  #return(active_entities_list)
   return(active_entities_dict)
 
 help_indent_formatter = lambda prog: argparse.RawTextHelpFormatter(
@@ -297,7 +317,6 @@ if __name__ == '__main__':
   else:
     active_entities = {}
 
-  #namespaces = [namespace]
   # namespaces is a dict of namespace_id : namespace_name
   namespaces = {'' : namespace} # we don't know the namespace id of the provided namespace, so we set it to empty.
 
@@ -327,12 +346,9 @@ if __name__ == '__main__':
 
   # get all child namespaces in this namespace and list any entities in that namespace
   while bool(namespaces):
-    #namespace = namespaces.pop(0)
-    #namespace_id = list(namespaces.keys()[0])
     namespace_id = next(iter(namespaces))
     namespace_name = namespaces[namespace_id]
     del namespaces[namespace_id]
-    #print(namespaces)
 
     client = hvac.Client(
       url = vault_addr,
@@ -362,10 +378,7 @@ if __name__ == '__main__':
       for key, value in namespaces_in_current_namespace.items():
         child_namespace_id = value['id']
         child_namespace_name = value['path']
-        #namespaces.append(child_namespace)
         namespaces[child_namespace_id] = child_namespace_name
-        #print(child_namespace)
-        #print("added " + child_namespace_id + " " + child_namespace_name)
 
   if args.format == 'json':
     print(json.dumps(output_list, indent = 2))
