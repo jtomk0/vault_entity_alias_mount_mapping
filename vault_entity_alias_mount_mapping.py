@@ -60,25 +60,23 @@ def get_entity_list(client, active_entities, namespace_id, namespace_name):
       for entity_alias in entity_aliases:
         try:
           mount_type = entity_alias['mount_type']
-          append_output_text("\t\t\tMount Type:\t\t{mount_type}\n".format(mount_type=mount_type))
         except Exception as ex:
           template = "An exception of type {0} occurred. Arguments:\n{1!r}"
           message = template.format(type(ex).__name__, ex.args)
           logging.debug(message)
           mount_type = ''
-          append_output_text("\t\t\tMount Type:\t\t{mount_type}\n".format(mount_type=mount_type))
           pass
-        
+        append_output_text("\t\t\tMount Type:\t\t{mount_type}\n".format(mount_type=mount_type))
+
         try:
           mount_path = entity_alias['mount_path']
-          append_output_text("\t\t\tMount Path:\t\t{mount_path}\n".format(mount_path=mount_path))
         except Exception as ex:
           template = "An exception of type {0} occurred. Arguments:\n{1!r}"
           message = template.format(type(ex).__name__, ex.args)
           logging.debug(message)
           mount_path = ''
-          append_output_text("\t\t\tMount Path:\t\t{mount_path}\n".format(mount_path=mount_path))
           pass
+        append_output_text("\t\t\tMount Path:\t\t{mount_path}\n".format(mount_path=mount_path))
 
         entity_alias_id = entity_alias['id']
         append_output_text("\t\t\tEntity Alias ID:\t{entity_alias_id}\n".format(entity_alias_id=entity_alias_id))

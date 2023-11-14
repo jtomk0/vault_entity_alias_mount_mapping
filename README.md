@@ -1,4 +1,4 @@
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ykhemani/vault_entity_alias_mount_mapping?style=plastic)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/jtomk0/vault_entity_alias_mount_mapping?style=plastic)
 
 # vault_entity_alias_mount_mapping
 
@@ -6,7 +6,7 @@
 
 For each entity, `vault_entity_alias_mount_mapping` outputs the entity ID and name. For each alias of that entity, the script outputs the alias name, alias ID and mount path.
 
-For clusters running Vault 1.11.0, `vault_entity_alias_mount_mapping` also indicates whether the entity has been active in the last year, and also when the entity was first active in that time period. Note that this relies on [Activity Export API](https://www.vaultproject.io/api-docs/system/internal-counters#activity-export), which was introduced in Vault 1.11.0 and is presently in Tech Preview.
+For clusters running Vault 1.11.0 or newer, `vault_entity_alias_mount_mapping` also indicates whether the entity has been active in the last year, and also when the entity was first active in that time period. Note that this relies on [Activity Export API](https://www.vaultproject.io/api-docs/system/internal-counters#activity-export), which was introduced in Vault 1.11.0 and is presently in Tech Preview.
 
 ## Use:
 
@@ -21,9 +21,9 @@ pip3 install -r requirements.txt
 ```
 
 `vault_entity_alias_mount_mapping` has been tested with:
-* [Python](https://www.python.org/) 3.9.10
-* [hvac](https://hvac.readthedocs.io/en/stable/overview.html) 0.11.2
-* [HashiCorp](https://hashicorp.com/) [Vault](https://vaultproject.io) 1.11.0
+* [Python](https://www.python.org/) 3.8.10, 3.9.10
+* [hvac](https://hvac.readthedocs.io/en/stable/overview.html) 0.11.2, 1.2.1
+* [HashiCorp](https://hashicorp.com/) [Vault](https://vaultproject.io) 1.11.0, 1.15.1
 
 #### Usage:
 
@@ -267,7 +267,7 @@ gzwYv,ns3/,996af036-01cb-47e8-68ce-1bb15a494b08,daily-strong-piglet,False,,5b9b4
 gzwYv,ns3/,c6944630-af31-9ced-d485-44cd2a50a3be,wholly-causal-trout,False,,e10e04fb-ac73-7cc0-8bde-92a219c73682,wholly-causal-trout,auth/userpass/,auth_userpass_5557a4f5,userpass
 ```
 
-### Run with Docker
+### Run with Docker (currently behind existing release version)
 
 ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/ykhemani/vault_entity_alias_mount_mapping?style=plastic)
 
