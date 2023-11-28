@@ -16,7 +16,7 @@ import logging
 import argparse
 from EnvDefault import env_default
 
-version = '0.0.4'
+version = '0.0.5'
 
 urllib3.disable_warnings()
 
@@ -78,13 +78,34 @@ def get_entity_list(client, active_entities, namespace_id, namespace_name):
           pass
         append_output_text("\t\t\tMount Path:\t\t{mount_path}\n".format(mount_path=mount_path))
 
-        entity_alias_id = entity_alias['id']
+        try:
+          entity_alias_id = entity_alias['id']
+        except Exception as ex:
+          template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+          message = template.format(type(ex).__name__, ex.args)
+          logging.debug(message)
+          entity_alias_id = ''
+          pass
         append_output_text("\t\t\tEntity Alias ID:\t{entity_alias_id}\n".format(entity_alias_id=entity_alias_id))
 
-        mount_accessor = entity_alias['mount_accessor']
+        try:
+          mount_accessor = entity_alias['mount_accessor']
+        except Exception as ex:
+          template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+          message = template.format(type(ex).__name__, ex.args)
+          logging.debug(message)
+          mount_accessor = ''
+          pass
         append_output_text("\t\t\tMount Accessor:\t\t{mount_accessor}\n".format(mount_accessor=mount_accessor))
 
-        entity_alias_name = entity_alias['name']
+        try:
+          entity_alias_name = entity_alias['name']
+        except Exception as ex:
+          template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+          message = template.format(type(ex).__name__, ex.args)
+          logging.debug(message)
+          entity_alias_name = ''
+          pass
         append_output_text("\t\t\tEntity Alias Name:\t{entity_alias_name}\n".format(entity_alias_name=entity_alias_name))
           
         append_output_text("\n")
